@@ -3,13 +3,22 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 
+const bodyParser= require("body-parser");
+const cors = require("cors");
+
 const { HoldingsModel }= require('./model/HoldingsModel');
 const { PositionsModel } = require("./model/PositionsModel");
 
 const PORT= process.env.PORT || 3001;
 const uri= process.env.MONGO_URL;
 
+
+
 const app=express();
+
+//after creating the application we enable cors and body-parser
+app.use(cors());
+app.use(bodyParser.json());
 
 //inserting initial data in db by setting up routes
 // app.get('/addHoldings', async(req, res)=>{
@@ -180,6 +189,14 @@ const app=express();
 //     res.send("DONE@!!");
 // });
 
+app.get('/allHoldings', async(req, res)=>{
+    let allHoldings = await HoldingsModel.find({});
+    res.json(allHoldings);
+});
+app.get('/allPositions', async(req, res)=>{
+    let allPositions = await PositionsModel.find({});
+    res.json(allPositions);
+});
 
 app.listen(PORT, ()=>{
     console.log("APP STARTED!!");
