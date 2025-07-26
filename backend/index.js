@@ -8,13 +8,44 @@ const cors = require("cors");
 
 const { HoldingsModel }= require('./model/HoldingsModel');
 const { PositionsModel } = require("./model/PositionsModel");
+const { OrdersModel } = require("./model/OrdersModel");
+const { UserModel } = require("./model/UserModel");
+
+const cookieParser = require("cookie-parser");
+const authRoute = require("./Routes/AuthRoute");
+const { MONGO_URL } = process.env;
+
 
 const PORT= process.env.PORT || 3001;
 const uri= process.env.MONGO_URL;
 
-
-
 const app=express();
+
+mongoose
+  .connect(MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB is  connected successfully"))
+  .catch((err) => console.error(err));
+
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
+
+app.use(
+  cors({
+    origin: ["http://localhost:3001"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+app.use(cookieParser());
+
+app.use(express.json());
+
+app.use("/", authRoute);
+
 
 //after creating the application we enable cors and body-parser
 app.use(cors());
@@ -215,3 +246,7 @@ app.listen(PORT, ()=>{
     console.log("APP STARTED!!");
     mongoose.connect(uri);
 });
+
+console.log('TOKEN_SECRET:', process.env.TOKEN_KEY);
+console.log('JWT Secret:', process.env.TOKEN_KEY);
+
